@@ -22,7 +22,18 @@ class image360 extends Component {
       xmax:0,
       coef: 0,
       positionEnter: 0,
-      imgEnter:0
+      positionExit:0,
+      imgEnter:0,
+
+
+
+      interval:0,
+      startTime:0,
+      endTime:0,
+      imgStart:0,
+      imgEnd:0,
+			isFristMove:0,
+			timeout:0,
     } 
     this.rotator = React.createRef()
   }
@@ -51,12 +62,79 @@ class image360 extends Component {
 
 
 
+  constructRotate = () =>{
+    //quantidade de imagens q foram movimentadas
+    var moveImg =  Math.abs( this.state.imgEnd -  this.state.imgStart);
+    //tempo que o mouse estava em movimento
+    var moveTime =   this.state.endTime -  this.state.startTime;
+
+    //validação para não dar '0'
+    if(moveImg<1){
+      moveImg = 1;
+    }
+    //tempo por cada imagem
+    var time = moveTime / moveImg;
+
+    //validação para não dar menor que 15
+    if(time < 20){
+      time = 20;
+    }
+
+    //valida direcao de giro
+    var direcao;
+    if(this.state.positionExit >  this.state.positionEnter){ direcao = "direita"; }
+    else{ direcao = "esquerda";}
+
+    //funcao para rotacionar
+    this.rotate(this.state.imgEnd, time, direcao);
+
+  }
+
+  rotate = (currentImg, time, dir) => {
+    //funcao para o intervalo de giro
+    let  tmpInterval = setInterval(function (){
+        if(dir == "direita"){
+          currentImg --;
+        }else if(dir == "esquerda"){
+          currentImg ++;
+        }
+
+        //ajuste com o 'mod' para que currentImg fique entre '0' a '(numImages-1)'
+        currentImg = this.moduleNum(currentImg,  this.state.numImages);
+
+        this.setState({
+          curImage:currentImg
+        }) 
+
+    }, time);
+    
+    this.setState({
+      interval:tmpInterval
+    }) 
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
   moduleNum = (a, b) => (((a % b) + b ) % b)
   
-  isMove = async (posX, posY) =>{
+  isMove = async (posX, posY, timeDown) =>{
     if(
       this.state.xmin < posX &&
       this.state.xmax > posX &&
@@ -77,8 +155,44 @@ class image360 extends Component {
       //ajuste com o 'mod' para que currentImg fique entre '0' a '(numImages-1)'
       currentImg = await this.moduleNum(currentImg, this.state.numImages);
 
+
+
+
+
+
+
+      let tmpStartTime
+      let tmpImgStart
+      let tmpIsFristMove
+     
+      /*
+      let tmpTimeout = setTimeout(function(){
+        this.setState({isFristMove: false }) 
+      }, 75)
+      */
+
+      
+      //if que so vai rodar se for o primeiro movimento
+      if(!this.state.isFristMove){
+        //startTime pega o tempo corrente no mouse
+        tmpStartTime = timeDown;
+        //pega o indice da primira imagem
+        tmpImgStart = currentImg;
+        tmpIsFristMove = true;
+      }else{
+        tmpStartTime  = 0
+        tmpImgStart = 0
+      }
+
       await this.setState({
-        curImage:currentImg
+        curImage:currentImg,
+        endTime: timeDown,
+        //timeout:tmpTimeout,
+
+        startTime: tmpStartTime,
+        imgStart: tmpImgStart,
+        isFristMove: tmpIsFristMove,
+        
       }) 
     }
   }
@@ -92,7 +206,9 @@ class image360 extends Component {
       coef: this.state.numImages / this.rotator.current.offsetHeight,
       positionEnter: posX - this.rotator.current.offsetLeft,
       imgEnter: this.state.curImage,
-      isMoveInit:true
+      isMoveInit:true,
+      interval:0
+ 
     })
 
 
@@ -101,22 +217,32 @@ class image360 extends Component {
   mouseMove = async (e)=>{
    const posX = e.pageX
    const posY = e.pageY
-   await this.isMove(posX, posY)
+   await this.isMove(posX, posY, e.timeStamp)
   }
 
   mouseDown = async (e) =>{
     const posX = e.pageX
     const posY = e.pageY
+    
     await this.isMoveInit(posX, posY)
   }
 
   mouseUp = async () =>{
+
+    if(this.state.isFristMove){
+      this.constructRotate();
+    }
+
     await this.setState({
       isMoveInit:false
     })
+
   }
 
   mouseLeave = async () =>{
+
+    this.constructRotate()
+
     await this.setState({
       isMoveInit:false
     })
@@ -137,6 +263,10 @@ class image360 extends Component {
   }
 
   touchEnd = async () =>{
+
+    if(this.state.isFristMove){
+      this.constructRotate();
+    }
     await this.setState({
       isMoveInit:false
     })
