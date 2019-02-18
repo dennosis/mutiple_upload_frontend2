@@ -1,0 +1,32 @@
+.dropzone{
+  border: 1px dashed #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: height 0.2s ease;
+}  
+
+.dropzoneDragActive{
+  border-color: #78e5d5;
+}  
+
+.dropzoneIsDragReject{
+  border-color: #e57878;
+}  
+
+.uploadMessage{
+  display: flex;
+  color: #999;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
+}
+
+.uploadMessageError{
+  color: #e57878;
+}
+
+.uploadMessageSuccess{
+  color: #78e5d5;
+}
+
+

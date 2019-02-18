@@ -1,0 +1,12 @@
+html {
+  width: 100%;
+  height: 100%;
+ background: radial-gradient(#1c2a2a,#0d0f0e);
+}
+
+
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+}

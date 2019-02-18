@@ -1,0 +1,47 @@
+
+.rotator{
+	/*position:absolute;*/
+	height:400px;
+	width:100%;
+	overflow:hidden;
+	border: 2px solid ;
+	border-radius: 5px;
+	border-color: red green blue yellow;
+
+	left: 50%;
+	transform: translateX(0%);
+
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+
+
+.rotator:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+}
+
+
+.img360{
+	position:absolute;
+	width: auto;
+	height: auto;
+	max-height: 100%;
+	max-width: 100%;
+	left: 50%;
+	top: 50%;
+	transform: translateY(-50%) translateX(-50%);
+	}
+
+	.none{
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+
+	}
